@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
-import bookRoutes from './routes/book';
+import bookRoutes from './routes/book.js';
 
 app.use('/', bookRoutes);
 
