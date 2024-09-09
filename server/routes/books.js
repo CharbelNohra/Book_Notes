@@ -1,23 +1,5 @@
 import { Router } from 'express';
-import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { getBooks, addBook, getBookById, searchBooks } from '../controllers/booksController.js';
-
-// Multer Configuration for Image Uploads
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../../public/uploads/'));
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-
-const upload = multer({ storage });
 
 const router = Router();
 
@@ -27,15 +9,17 @@ const router = Router();
 router.get('/', getBooks);
 
 // Add new book
-router.get('/add-book', (req, res) => {
-    res.render('add-book');
+router.get('/add_book', (req, res) => {
+    res.render('add_book');
 });
-router.post('/add-book', upload.single('coverImage'), addBook);
 
-// View specific book
+// Post new book (no image upload, just URL input)
+router.post('/add_book', addBook);
+
+// View specific book by ID
 router.get('/book/:id', getBookById);
 
-// Search for books
+// Search for books by title or author
 router.get('/search', searchBooks);
 
 export default router;

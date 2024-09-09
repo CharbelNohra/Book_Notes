@@ -1,16 +1,16 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-
-import booksRoutes from './server/routes/books.js';  // Import book routes
+import booksRoutes from './server/routes/books.js'; // Import book routes
 
 dotenv.config();
+
 const app = express();
 
 // Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded bodies
+app.use(express.json()); // Middleware to parse JSON bodies
 app.set('view engine', 'ejs');
 
 // Serving static files

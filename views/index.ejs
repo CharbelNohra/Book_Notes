@@ -5,10 +5,80 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Book Notes</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="../public/styles.css">
     </head>
 
     <body>
-        <h1>Book Notes</h1>
+        <div class="container mt-5">
+            <header class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-primary">Book Notes</h1>
+
+                <!-- Search Bar -->
+                <form action="/search" method="GET" class="d-flex me-3">
+                    <input class="form-control me-2" type="search" name="query" placeholder="Search by title or author..."
+                        aria-label="Search" required>
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+
+                <!-- Sort Dropdown -->
+                <form action="/" method="GET" class="d-flex">
+                    <select name="sort" class="form-select me-2" onchange="this.form.submit()">
+                        <option value="" disabled selected>Sort by</option>
+                        <option value="name">Name</option>
+                        <option value="rating">Rating</option>
+                    </select>
+                </form>
+
+                <a href="/add_book" class="btn btn-primary">Add New Book</a>
+            </header>
+
+            <!-- Book List Section -->
+            <div class="row">
+                <% if (books.length> 0) { %>
+                    <% books.forEach(book=> { %>
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <% if (book.cover_image_url) { %>
+                                            <img src="<%= book.cover_image_url %>" class="img-fluid rounded-start"
+                                                alt="Book Cover">
+                                            <% } %>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <a href="/book/<%= book.id %>" class="text-decoration-none text-dark">
+                                                    <%= book.title %>
+                                                </a>
+                                            </h5>
+                                            <p class="card-text text-muted">by <%= book.author %>
+                                            </p>
+                                            <p class="card-text"><strong>Rating:</strong>
+                                                <%= book.rating %> / 5.0
+                                            </p>
+                                            <p class="card-text">
+                                                <%= book.notes.length> 100 ? book.notes.substring(0, 100) + '...' :
+                                                    book.notes %>
+                                                    <a href="/book/<%= book.id %>" class="text-primary">Read more</a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                            <% } else { %>
+                                <div class="col-12 text-center">
+                                    <p class="text-muted">No books found. Start by <a href="/add_book"
+                                            class="text-primary">adding a new book</a>.</p>
+                                </div>
+                                <% } %>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 
 </html>
