@@ -12,14 +12,15 @@ export const getBooks = async (req, res) => {
 };
 
 // Add a new book
+// Add a new book
 export const addBook = async (req, res) => {
-    const { title, author, notes } = req.body;
+    const { title, author, notes, rating } = req.body; // Include rating
     const coverImage = req.file ? req.file.filename : null;
 
     try {
         await pool.query(
-            'INSERT INTO books (title, author, notes, cover_image) VALUES ($1, $2, $3, $4)',
-            [title, author, notes, coverImage]
+            'INSERT INTO books (title, author, notes, cover_image, rating) VALUES ($1, $2, $3, $4, $5)',
+            [title, author, notes, coverImage, rating] // Include rating
         );
         res.redirect('/');
     } catch (err) {
@@ -60,3 +61,4 @@ export const searchBooks = async (req, res) => {
         res.send("Error searching for books");
     }
 };
+
