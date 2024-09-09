@@ -1,17 +1,27 @@
 import express from 'express';
-import { urlencoded } from 'body-parser';
+import bodyParser from 'body-parser';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+import booksRoutes from './server/routes/books.js';  // Import book routes
+
+dotenv.config();
 const app = express();
-require('dotenv').config();
 
-app.use(urlencoded({ extended: true }));
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
-app.use(express.static('public'));
 
-import bookRoutes from './server/routes/books';
+// Serving static files
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', bookRoutes);
+// Routes
+app.use('/', booksRoutes); // Use book routes
 
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

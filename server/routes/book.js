@@ -1,87 +1,41 @@
 import { Router } from 'express';
-const router = Router();
-import { query } from '../db.js'; // Import the database connection
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { getBooks, addBook, getBookById, searchBooks } from '../controllers/booksController.js';
 
-import multer, { diskStorage } from 'multer';
-import { extname } from 'path';
+// Multer Configuration for Image Uploads
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-
-const storage = diskStorage({
+const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './public/uploads/');
+        cb(null, path.join(__dirname, '../../public/uploads/'));
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + extname(file.originalname));
+        cb(null, Date.now() + path.extname(file.originalname));
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
+const router = Router();
 
-router.get('/', async (req, res) => {
-    try {
-        const result = await query('SELECT * FROM books ORDER BY id DESC');
-        res.render('index', { books: result.rows });
-    } catch (err) {
-        console.error(err);
-        res.send('Error retrieving books');
-    }
-});
+// Routes
 
+// Get all books
+router.get('/', getBooks);
 
+// Add new book
 router.get('/add-book', (req, res) => {
     res.render('add-book');
 });
+router.post('/add-book', upload.single('coverImage'), addBook);
 
+// View specific book
+router.get('/book/:id', getBookById);
 
-router.post('/add-book', upload.single('coverImage'), async (req, res) => {
-    const { title, author, notes } = req.body;
-    const coverImage = req.file ? req.file.filename : null;
-
-    try {
-        await query(
-            'INSERT INTO books (title, author, notes, cover_image) VALUES ($1, $2, $3, $4)',
-            [title, author, notes, coverImage]
-        );
-        res.redirect('/');
-    } catch (err) {
-        console.error(err);
-        res.send('Error adding book');
-    }
-});
-
-router.get('/book/:id', async (req, res) => {
-    const bookId = req.params.id;
-
-    try {
-        const result = await query('SELECT * FROM books WHERE id = $1', [bookId]);
-
-        if (result.rows.length === 0) {
-            return res.status(404).send('Book not found');
-        }
-
-        const book = result.rows[0];
-        res.render('book-details', { book });
-    } catch (err) {
-        console.error(err);
-        res.send('Error retrieving the book');
-    }
-});
-
-router.get('/search', async (req, res) => {
-    const searchQuery = req.query.query;
-
-    try {
-        const result = await query(
-            `SELECT * FROM books WHERE LOWER(title) LIKE LOWER($1) OR LOWER(author) LIKE LOWER($1)`,
-            [`%${searchQuery}%`]
-        );
-
-        res.render('index', { books: result.rows });
-    } catch (err) {
-        console.error(err);
-        res.send('Error searching for books');
-    }
-});
+// Search for books
+router.get('/search', searchBooks);
 
 export default router;
